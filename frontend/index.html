@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tet | Web3 Escrow Platform</title>
+<meta name="description" content="Tet is a decentralized, secure Web3 escrow platform for freelancers, OTC deals and real-world assets." />
+<link rel="stylesheet" href="css/landing.css" />
+</head>
+<body>
+
+<header id="site-header"></header>
+
+<main class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="art-card">
+      <svg viewBox="0 0 640 560" role="img" aria-label="A floating tetrahedron above a soft shadow">
+        <ellipse cx="320" cy="482" rx="190" ry="32" fill="#000" opacity=".12"/>
+        <polygon points="320,70 150,360 340,440" fill="#0a0a0a"/>
+        <polygon points="320,70 340,440 500,330" fill="#6a3df0"/>
+        <polygon points="320,70 340,440 400,300" fill="#8a66ff" opacity=".7"/>
+        <polygon points="110,130 78,196 142,196" fill="#0a0a0a"/>
+        <polygon points="548,150 516,214 580,214" fill="#fff" stroke="#0a0a0a" stroke-width="5"/>
+        <circle cx="560" cy="380" r="16" fill="#6a3df0"/>
+        <circle cx="86" cy="330" r="10" fill="#0a0a0a"/>
+        <circle cx="470" cy="80" r="9" fill="#0a0a0a"/>
+      </svg>
+    </div>
+    <div class="hero-copy">
+      <h1>Web3 Escrow Platform</h1>
+      <div>
+        <div class="hero-actions">
+          <a class="btn btn-outline" href="app/index.html">Open App <span class="arrow"></span></a>
+          <a class="btn btn-dark" href="#" data-link="docs">Docs <span class="arrow"></span></a>
+          <div class="social-pill">
+            <a href="#" data-link="telegram" aria-label="Telegram"><svg viewBox="0 0 24 24"><path d="M9.8 15.2l-.4 4.2c.6 0 .9-.3 1.2-.6l2.9-2.7 6 4.4c1.1.6 1.9.3 2.2-1L23.9 4.2c.4-1.6-.6-2.2-1.6-1.8L1.2 10.5c-1.5.6-1.5 1.4-.3 1.8l5.4 1.7L18.9 6c.6-.4 1.1-.2.7.2z"/></svg></a>
+            <a href="#" data-link="twitter" aria-label="X (Twitter)"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a href="#" data-link="youtube" aria-label="YouTube"><svg viewBox="0 0 24 24"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6z"/></svg></a>
+          </div>
+        </div>
+        <div class="partner-pill" style="margin-top:24px">
+          <a href="#" data-link="dextools">DEXTools</a>
+          <a href="#" data-link="coinmarketcap">CoinMarketCap</a>
+          <a href="#" data-token-link="uniswap">UNISWAP</a>
+          <a href="#" data-token-link="etherscan">Etherscan</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR RECEIVER / FOR SENDER / STATS -->
+  <section class="cards-3">
+    <a class="info-card" href="for-receiver.html">
+      <div class="hawk-slot ico" data-scene="receiver" data-img="assets/hawk-receiver.png"></div>
+      <svg class="go" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+      <h3>For Receiver</h3>
+      <p>Receive Payment Safely, Feel Secure.</p>
+    </a>
+    <a class="info-card" href="for-sender.html">
+      <div class="hawk-slot ico" data-scene="sender" data-img="assets/hawk-sender.png"></div>
+      <svg class="go" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg>
+      <h3>For Sender</h3>
+      <p>Gain Trust, Show Commitment.</p>
+    </a>
+    <div class="info-card stat-card">
+      <div class="stat-top">
+        <svg class="person" viewBox="0 0 44 44" fill="none" stroke="#0a0a0a" stroke-width="4" stroke-linecap="round" aria-hidden="true"><circle cx="22" cy="12" r="8"/><path d="M6 40c0-9 7-15 16-15s16 6 16 15"/></svg>
+        <div class="num" id="stat-users">-</div>
+      </div>
+      <p>Users Registered Successfully.</p>
+      <button class="info-btn" id="stat-info" aria-label="About this number">!</button>
+      <div class="popover" id="stat-pop" role="tooltip">This is the live count of wallets that have signed in to Tet. It is read from our database, not typed in by hand.</div>
+    </div>
+  </section>
+
+  <!-- WHAT IS TET -->
+  <section class="section about" id="about">
+    <div class="about-copy">
+      <div>
+        <h2>What is Tet?</h2>
+        <p class="lead">Tet is a Web3 platform built for a new era of crypto transactions. It gives you a secure, transparent place to make a deal without relying on trust alone: your funds sit in a smart contract, not in someone's account. Use it for freelance work, real-world asset trades, OTC deals, or any agreement between two parties.</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-outline" href="#" data-token-link="uniswap">Buy $TET <span class="arrow"></span></a>
+        <a class="btn btn-dark" href="app/index.html">Get Started <span class="arrow"></span></a>
+      </div>
+    </div>
+    <div class="art-card" style="min-height:560px">
+      <svg viewBox="0 0 520 560" role="img" aria-label="A rocket launching from a cloud">
+        <ellipse cx="260" cy="500" rx="200" ry="34" fill="#fff"/>
+        <circle cx="120" cy="486" r="44" fill="#fff"/><circle cx="400" cy="484" r="50" fill="#fff"/><circle cx="260" cy="470" r="52" fill="#fff"/>
+        <path d="M225 340 Q260 470 295 340z" fill="#ff8a3d"/>
+        <polygon points="170,300 106,410 170,376" fill="#3a3a3a"/>
+        <polygon points="350,300 414,410 350,376" fill="#3a3a3a"/>
+        <path d="M260 40 C338 110 356 210 356 340 L164 340 C164 210 182 110 260 40z" fill="#fff" stroke="#0a0a0a" stroke-width="6"/>
+        <path d="M260 40 C296 74 316 118 326 168 L194 168 C204 118 224 74 260 40z" fill="#3a3a3a"/>
+        <circle cx="260" cy="250" r="44" fill="#b9a5ff" stroke="#0a0a0a" stroke-width="8"/>
+        <text x="260" y="322" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-weight="800" font-size="30" fill="#0a0a0a">TET</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- RWA + SECURE / DECENTRALIZED / SMART -->
+  <section class="section dark-panel" id="products">
+    <div class="rwa">
+      <div class="rwa-art">
+        <svg viewBox="0 0 560 520" role="img" aria-label="A globe on a pedestal with floating banknotes">
+          <ellipse cx="280" cy="430" rx="190" ry="44" fill="#4a4a4a"/>
+          <ellipse cx="280" cy="418" rx="150" ry="32" fill="#8a8a8a"/>
+          <ellipse cx="280" cy="404" rx="96" ry="20" fill="#e9e9e9"/>
+          <circle cx="280" cy="250" r="132" fill="#4f8bff"/>
+          <ellipse cx="280" cy="250" rx="132" ry="52" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="4"/>
+          <ellipse cx="280" cy="250" rx="52" ry="132" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="4"/>
+          <ellipse cx="280" cy="250" rx="196" ry="70" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="6 10" transform="rotate(-24 280 250)"/>
+          <g transform="rotate(-18 110 150)"><rect x="60" y="120" width="110" height="60" rx="8" fill="#6fbf73"/><circle cx="115" cy="150" r="16" fill="#3f8f4a"/></g>
+          <g transform="rotate(14 470 120)"><rect x="410" y="92" width="110" height="60" rx="8" fill="#6fbf73"/><circle cx="465" cy="122" r="16" fill="#3f8f4a"/></g>
+          <g transform="rotate(-30 90 330)"><rect x="40" y="300" width="100" height="56" rx="8" fill="#6fbf73"/><circle cx="90" cy="328" r="15" fill="#3f8f4a"/></g>
+        </svg>
+      </div>
+      <div>
+        <h2>Real World Asset Services</h2>
+        <p>Wondering what can kick-start the real-world-asset era of Web3? Will the other side really deliver the product or service you are paying for? Can you buy something with crypto without worrying about being scammed? Is your OTC trade guaranteed for both sides? Even a friendly bet works better in escrow. There are endless scenarios, and the solution is here.</p>
+        <div class="btn-row">
+          <a class="btn btn-light" href="#how-it-works">Learn More <span class="arrow"></span></a>
+          <a class="btn btn-outline-light" href="partners.html">Partners <span class="arrow"></span></a>
+        </div>
+      </div>
+    </div>
+    <div class="trio">
+      <div class="tcard">
+        <div><small>Tet is</small><h3>Secure</h3></div>
+        <p>A secure system for both sides of a deal. Why risk paying a stranger up front for a service, a freelancer or a real-world asset? Let Tet hold the funds until the job is done.</p>
+        <a class="btn" href="app/index.html">Get Started <span class="arrow"></span></a>
+      </div>
+      <div class="tcard">
+        <div><small>Tet is</small><h3>Decentralized</h3></div>
+        <p>Tet is contract-based. Funds sit in a smart contract, not a company account, and only the agreement's own rules can move them: a release, an auto-release, or an arbiter's ruling in a dispute.</p>
+        <a class="btn" href="app/index.html">Get Started <span class="arrow"></span></a>
+      </div>
+      <div class="tcard">
+        <div><small>Tet is</small><h3>Smart</h3></div>
+        <p>When money is pending, people tend to deliver. The sender trusts that the payment is there, the receiver has every reason to earn the release. It is a win-win by design.</p>
+        <a class="btn" href="app/index.html">Get Started <span class="arrow"></span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRESS -->
+  <section class="section" id="press">
+    <div class="press-head"><h2>Press Release</h2></div>
+    <div class="press-track" id="press-track"></div>
+    <div class="press-nav">
+      <button class="circle-btn" id="press-prev" aria-label="Previous"><span class="arrow flip"></span></button>
+      <button class="circle-btn" id="press-next" aria-label="Next"><span class="arrow"></span></button>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section how" id="how-it-works">
+    <h2>How Tet Works?</h2>
+    <div class="how-grid">
+      <div class="steps" id="steps"></div>
+      <div class="step-card" id="step-card"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer id="site-footer" class="footer"></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/hawk3d.js"></script>
+<script src="js/config.js"></script>
+<script src="js/site-config.js"></script>
+<script src="js/site.js"></script>
+<script src="js/landing.js"></script>
+</body>
+</html>

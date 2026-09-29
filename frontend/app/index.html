@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tet | App</title>
+<link rel="stylesheet" href="../css/landing.css" />
+<link rel="stylesheet" href="../css/app-home.css" />
+</head>
+<body>
+<div class="reveal" aria-hidden="true" id="reveal"></div>
+<script>(function(){var r=document.getElementById("reveal");try{var o=sessionStorage.getItem("tet_launch_origin");if(o){var p=o.split(" ");r.style.setProperty("--ox",p[0]);r.style.setProperty("--oy",p[1]);}else{r.classList.add("no-origin");}sessionStorage.removeItem("tet_launch_origin");}catch(e){r.classList.add("no-origin");}})();</script>
+<div class="wrap">
+  <header class="app-top rise" style="--i:0">
+    <a class="app-logo" href="../index.html" aria-label="Back to the Tet website"><span class="logo-mark" data-tet3d><svg viewBox="0 0 32 32" aria-hidden="true"><polygon points="16,2 2,25 19,30" fill="currentColor"/><polygon points="16,2 19,30 30,21" fill="currentColor" opacity=".55"/></svg></span><span>tet</span></a>
+    <button class="btn-wallet" id="wallet-btn" data-wallet-pill>Connect Wallet</button>
+  </header>
+
+  <main class="home-cols">
+    <div class="col">
+      <section class="big-black rise" style="--i:1" data-hover-host>
+        <div class="welcome"><span>Welcome to</span><b>tet</b></div>
+        <div class="sprite hawk-slot" data-frames="../assets/hero/f%03d.webp" data-count="24" aria-label="Animated Tet hawk. Hover to see an escrow transfer move from client to freelancer."></div>
+        <div class="big-foot">
+          <div class="tag"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Decentralized Escrow</div>
+          <a class="btn-white" href="dashboard.html">Open App</a>
+        </div>
+      </section>
+      <a class="pill-card about-c rise" style="--i:6" href="#" data-link="docs"><span class="ttl"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg>About us</span><small>Read Docs <span class="arrow"></span></small></a>
+    </div>
+
+    <div class="col">
+      <section class="stats-black rise" style="--i:2">
+        <h2>Transfer your funds securely and transparently</h2>
+        <div class="stat-b"><b id="s-jobs">0</b><span>Total<br>Jobs</span></div>
+        <div class="stat-b"><b id="s-funds">0 ETH</b><span>Funds<br>Transferred</span></div>
+      </section>
+      <div class="mid-row">
+        <div class="stack">
+          <a class="act-card act-send rise" style="--i:3" href="create-escrow.html">
+            <h3><svg viewBox="0 0 24 24"><rect x="3" y="6" width="12" height="12" rx="2"/><path d="M15 12h6M18 9l3 3-3 3"/></svg>Send Funds</h3>
+            <div class="go-row">Create/Initialize Offers <span class="arrow"></span></div>
+          </a>
+          <a class="act-card act-recv rise" style="--i:4" href="dashboard.html">
+            <h3><svg viewBox="0 0 24 24"><rect x="9" y="6" width="12" height="12" rx="2"/><path d="M3 12h6M6 9l-3 3 3 3"/></svg>Receive Funds</h3>
+            <div class="go-row">Request/Accept Offers <span class="arrow"></span></div>
+          </a>
+        </div>
+        <section class="white-card rise" style="--i:5">
+          <h3>Web3 is Secure and Transparent when using <b>Tet.</b></h3>
+          <div id="job-list"><p class="job-empty">Connect your wallet to see your latest jobs here.</p></div>
+        </section>
+      </div>
+      <a class="pill-card contact-c rise" style="--i:7" href="#" data-email><span class="ttl"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A15 15 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>Contact us</span><small>Send us an Email <span class="arrow"></span></small></a>
+    </div>
+  </main>
+</div>
+
+<script src="../js/hawk3d.js"></script>
+<script src="../js/sprite.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/site-config.js"></script>
+<script src="../js/site.js"></script>
+<script src="../js/wallet.js"></script>
+<script src="../js/api.js"></script>
+<script>
+(function () {
+  var C = window.TET_CONFIG, T = window.TetSite;
+  var btn = document.getElementById("wallet-btn"), list = document.getElementById("job-list");
+  function short(a) { return a.slice(0, 6) + "..." + a.slice(-4); }
+  function fmt(n) { return Number(n).toLocaleString(undefined, { maximumFractionDigits: 4 }); }
+
+  fetch(C.API_BASE + "/stats")
+    .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function (s) {
+      document.getElementById("s-jobs").textContent = fmt(s.agreements_created);
+      document.getElementById("s-funds").textContent = fmt(s.funds_released_eth) + " ETH";
+    })
+    .catch(function () {
+      document.getElementById("s-jobs").textContent = "-";
+      document.getElementById("s-funds").textContent = "-";
+    });
+
+  async function loadJobs() {
+    try {
+      var jobs = await TetApi.myEscrows();
+      if (!jobs.length) { list.innerHTML = '<p class="job-empty">No jobs yet. Use Send Funds to create your first one.</p>'; return; }
+      list.innerHTML = jobs.slice(0, 2).map(function (j) {
+        return '<div class="job"><div class="job-row"><div><b>' + T.esc(j.title) + '</b><small>' + T.esc(j.status) + '</small></div>' +
+          '<div><small>Amount in Escrow</small><b>' + T.esc(fmt(j.amount)) + ' ' + symbolForToken(j.token_address) + '</b></div></div>' +
+          '<div class="job-row"><span><span class="addr-chip">' + short(j.sender_address) + '</span> &rarr; <span class="addr-chip">' + short(j.receiver_address) + '</span></span>' +
+          '<a class="btn-open" href="escrow-detail.html?id=' + j.id + '">Open Job</a></div></div>';
+      }).join("");
+    } catch (e) {
+      list.innerHTML = '<p class="job-empty">Connect your wallet to see your latest jobs here.</p>';
+    }
+  }
+
+  btn.addEventListener("click", async function () {
+    try {
+      var ok = await Tet.signInWithEthereum();
+      if (ok) { loadJobs(); }
+    } catch (e) {
+      T.toast("Couldn't sign in. Is the Tet server running?");
+    }
+  });
+  if (localStorage.getItem("tet_jwt")) {
+    btn.textContent = short(localStorage.getItem("tet_wallet") || "Connected");
+    loadJobs();
+  }
+})();
+</script>
+</body>
+</html>

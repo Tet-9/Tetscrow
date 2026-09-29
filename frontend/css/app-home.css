@@ -1,0 +1,86 @@
+body{overflow-x:hidden}
+.app-top{display:flex;align-items:center;justify-content:space-between;padding:32px 0}
+.app-logo{display:flex;align-items:center;gap:12px;font-size:2.3rem;font-weight:600;letter-spacing:-.03em}
+.app-logo .logo-mark{width:52px;height:52px}
+.btn-wallet{background:#333;color:#fff;padding:.9em 1.6em;border-radius:14px;font-weight:600;font-size:1.05rem}
+.btn-white{background:#fff;color:#000;border-radius:14px;padding:.9em 1.6em;font-weight:600;font-size:1.05rem;transition:transform .15s}
+.btn-white:hover{transform:translateY(-2px)}
+.home-cols{display:grid;grid-template-columns:1fr 1.06fr;gap:38px;padding-bottom:64px}
+.col{display:flex;flex-direction:column;gap:38px}
+.big-black{flex:1;background:#000;color:#fff;border-radius:44px;padding:48px 52px;display:flex;flex-direction:column;justify-content:space-between;min-height:720px}
+.welcome{display:flex;justify-content:space-between;align-items:baseline}
+.welcome span{font-size:2.4rem}
+.welcome b{font-size:clamp(4rem,8vw,7rem);letter-spacing:-.05em;font-weight:500;line-height:.9}
+.big-black .hawk-slot{flex:1;min-height:400px;margin:8px 0}
+.big-foot{display:flex;justify-content:space-between;align-items:center}
+.tag{display:flex;align-items:center;gap:12px;font-size:1.5rem;font-weight:600}
+.tag svg,.act-card svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.stats-black{background:#000;color:#fff;border-radius:44px;padding:44px 52px;display:grid;grid-template-columns:1fr auto auto;gap:36px;align-items:center}
+.stats-black h2{font-size:clamp(1.6rem,2.5vw,2.5rem);letter-spacing:-.03em;font-weight:600;line-height:1.25}
+.stat-b{text-align:center}
+.stat-b b{display:block;font-size:2.4rem;font-weight:500}
+.stat-b span{color:#ddd;font-size:1.15rem}
+.mid-row{flex:1;display:grid;grid-template-columns:1fr 1.05fr;gap:38px}
+.stack{display:grid;grid-template-rows:1fr 1fr;gap:38px}
+.act-card{border-radius:44px;padding:40px;color:#fff;display:flex;flex-direction:column;justify-content:space-between;min-height:230px;transition:transform .2s}
+.act-card:hover{transform:translateY(-4px)}
+.act-card h3{font-size:2.2rem;font-weight:600;display:flex;align-items:center;gap:14px}
+.go-row{display:flex;justify-content:space-between;align-items:center;font-size:1.3rem;font-weight:600}
+.act-send{background:#333}
+.act-recv{background:#7a63c9}
+.white-card{background:#fff;border-radius:44px;padding:40px;display:flex;flex-direction:column;gap:20px}
+.white-card h3{font-size:2.2rem;font-weight:600;letter-spacing:-.03em;line-height:1.2;color:#777}
+.white-card h3 b{color:#000}
+.job{background:#f3f3f3;border-radius:22px;padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.job-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.job small{color:#777;font-size:.8rem;display:block}
+.job b{font-weight:600}
+.addr-chip{background:#fff;border-radius:12px;padding:6px 12px;font-size:.85rem;display:inline-flex;gap:6px;align-items:center}
+.btn-open{background:#000;color:#fff;border-radius:12px;padding:.6em 1.2em;font-size:.9rem;font-weight:600}
+.job-empty{color:#777;font-size:1.1rem}
+.pill-card{border-radius:44px;padding:30px 44px;display:flex;justify-content:space-between;align-items:center;font-size:2.3rem;font-weight:500;transition:transform .2s}
+.pill-card:hover{transform:translateY(-3px)}
+.pill-card .ttl{display:flex;align-items:center;gap:14px}
+.pill-card .ttl svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.pill-card small{font-size:1.2rem;font-weight:600;display:flex;align-items:center;gap:12px}
+.about-c{background:#cbb9ff}
+.contact-c{background:#fff}
+
+/* arrival animation after "Launch App" -- continues the wipe started on the landing page.
+   clip-path:circle(X%) sets the VISIBLE area of this black overlay, so it must start
+   large (fully covering, matching where the landing-page wipe left off) and shrink to
+   nothing to reveal the page -- not the other way around. */
+.reveal{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:200;pointer-events:none;clip-path:circle(150% at var(--ox,92%) var(--oy,6%));animation:reveal .6s cubic-bezier(.6,0,.15,1) both}
+.reveal.no-origin{clip-path:circle(150% at 92% 6%);animation:reveal-fallback .6s cubic-bezier(.6,0,.15,1) both}
+@keyframes reveal{0%{clip-path:circle(150% at var(--ox,92%) var(--oy,6%))}100%{clip-path:circle(0% at var(--ox,92%) var(--oy,6%))}}
+@keyframes reveal-fallback{0%{clip-path:circle(150% at 92% 6%)}100%{clip-path:circle(0% at 92% 6%)}}
+@media (prefers-reduced-motion:reduce){.reveal{display:none}.rise{animation:none;opacity:1;transform:none}}
+@media (max-width:1000px){
+  .home-cols,.mid-row,.stats-black{grid-template-columns:1fr}
+  .big-black{min-height:560px;padding:32px}
+  .pill-card{font-size:1.7rem;padding:24px 28px}
+}
+
+/* create-job wizard */
+.wiz{display:grid;grid-template-columns:1fr 1.15fr;gap:32px;max-width:1000px;margin:0 auto}
+.wiz-steps{background:#000;color:#fff;border-radius:32px;padding:40px 36px;display:flex;flex-direction:column;gap:22px;align-self:start}
+.wiz-steps h3{font-weight:600;font-size:1.2rem}
+.wiz-bars{display:flex;gap:8px;margin:-4px 0 6px}
+.wiz-bars span{height:4px;flex:1;border-radius:3px;background:#444}
+.wiz-bars span.done{background:#fff}
+.wiz-step{display:flex;gap:12px;align-items:flex-start;opacity:.45}
+.wiz-step.active{opacity:1}
+.wiz-step .arrow-i{margin-top:5px;flex:0 0 auto}
+.wiz-card{background:#fff;border-radius:32px;padding:40px;display:flex;flex-direction:column;gap:20px}
+.wiz-field input,.wiz-field textarea,.wiz-field select{width:100%;border:none;background:#eceaf6;border-radius:14px;padding:16px 20px;font-size:1.05rem;font-family:inherit;color:#000}
+.wiz-field textarea{min-height:160px;resize:vertical}
+.wiz-field input::placeholder,.wiz-field textarea::placeholder{color:#8a8a92}
+.wiz-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:auto}
+.btn-black-full{width:100%;background:#000;color:#fff;border-radius:14px;padding:1em;font-weight:600;font-size:1.05rem;text-align:center}
+.btn-black-full:disabled{opacity:.4}
+.wiz-back{align-self:flex-start;color:#666;font-weight:600;padding:.5em 0}
+
+/* authorization gate */
+.gate{max-width:640px;margin:60px auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:22px}
+.gate .hawk-slot{width:340px;max-width:80vw}
+.gate p{font-size:1.35rem;font-weight:600}

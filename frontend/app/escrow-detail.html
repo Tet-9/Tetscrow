@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agreement — Tet</title>
+<link rel="stylesheet" href="../css/styles.css" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a href="../index.html" class="brand" style="padding:10px 14px; margin-bottom:12px;"><span class="brand-mark"></span> Tet</a>
+    <a href="index.html">Home</a>
+    <a href="dashboard.html" class="active">Dashboard</a>
+    <a href="create-escrow.html">Create Agreement</a>
+    <a href="disputes.html">Disputes</a>
+    <a href="../index.html#token">$TET Token</a>
+    <div style="margin-top:auto; padding-top:20px;">
+      <button class="btn btn-primary" style="width:100%;" onclick="Tet.signInWithEthereum()">Connect Wallet</button>
+      <div class="wallet-pill" data-wallet-pill style="margin-top:10px; justify-content:center;">Not connected</div>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <div class="page-head">
+      <h1 id="escrow-title">Loading…</h1>
+      <span class="badge" id="escrow-badge"></span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Details</h3>
+        <p id="escrow-desc" style="margin-bottom:16px;"></p>
+        <p style="color:var(--text-dim); font-size:0.9rem;">Sender: <span id="escrow-sender" style="font-family:var(--font-mono);"></span></p>
+        <p style="color:var(--text-dim); font-size:0.9rem;">Receiver: <span id="escrow-receiver" style="font-family:var(--font-mono);"></span></p>
+        <p style="color:var(--text-dim); font-size:0.9rem;">Amount: <span id="escrow-amount"></span></p>
+
+        <div style="margin-top:24px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="doMarkDelivered()">Mark Delivered</button>
+          <button class="btn btn-primary btn-sm" onclick="doRelease()">Release Funds</button>
+          <button class="btn btn-ghost btn-sm" onclick="doDispute()">Raise Dispute</button>
+          <button class="btn btn-ghost btn-sm" id="auto-release-btn" style="display:none;" onclick="doAutoRelease()">Trigger Auto-Release</button>
+        </div>
+        <p id="auto-release-note" style="color:var(--text-dim); margin-top:10px; font-size:0.85rem;"></p>
+        <p id="action-status" style="color:var(--text-dim); margin-top:14px; font-size:0.88rem;"></p>
+      </div>
+
+      <div class="card">
+        <h3>Timeline</h3>
+        <div class="timeline" id="timeline"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/wallet.js"></script>
+<script src="../js/api.js"></script>
+<script>
+  const escrowId = new URLSearchParams(location.search).get("id");
+  const STAGES = ["created", "funded", "delivered", "released"];
+
+  async function load() {
+    const e = await TetApi.getEscrow(escrowId, true);
+    document.getElementById("escrow-title").textContent = e.title;
+    document.getElementById("escrow-badge").className = "badge " + e.status;
+    document.getElementById("escrow-badge").textContent = e.status;
+    document.getElementById("escrow-desc").textContent = e.description || "No description provided.";
+    document.getElementById("escrow-sender").textContent = e.sender_address;
+    document.getElementById("escrow-receiver").textContent = e.receiver_address;
+    document.getElementById("escrow-amount").textContent = `${e.amount} ${symbolForToken(e.token_address)}`;
+
+    const currentIdx = STAGES.indexOf(e.status);
+    const timeline = document.getElementById("timeline");
+    timeline.innerHTML = STAGES.map((s, i) => `
+      <div class="timeline-item">
+        <div class="timeline-dot-col">
+          <div class="timeline-dot ${i <= currentIdx ? "done" : ""}"></div>
+          <div class="timeline-line"></div>
+        </div>
+        <div class="timeline-content">
+          <h4 style="text-transform:capitalize;">${s}</h4>
+          <p>${i <= currentIdx ? "Completed" : "Pending"}</p>
+        </div>
+      </div>`).join("");
+
+    window._escrow = e;
+
+    const autoBtn = document.getElementById("auto-release-btn");
+    const autoNote = document.getElementById("auto-release-note");
+    if (e.status === "delivered") {
+      autoBtn.style.display = "inline-flex";
+      autoNote.textContent = "If the sender hasn't released within the auto-release window, anyone can trigger release to the receiver.";
+    } else {
+      autoBtn.style.display = "none";
+      autoNote.textContent = "";
+    }
+  }
+
+  function statusMsg(text, ok = true) {
+    const el = document.getElementById("action-status");
+    el.textContent = text;
+    el.style.color = ok ? "var(--accent)" : "var(--danger)";
+  }
+
+  async function doMarkDelivered() {
+    try {
+      await Tet.connectWallet();
+      const c = Tet.getEscrowContract();
+      const tx = await c.markDelivered(window._escrow.onchain_id);
+      await tx.wait();
+      statusMsg("Marked as delivered on-chain.");
+      load();
+    } catch (err) { statusMsg(err.message || String(err), false); }
+  }
+
+  async function doRelease() {
+    try {
+      await Tet.connectWallet();
+      const c = Tet.getEscrowContract();
+      const tx = await c.release(window._escrow.onchain_id);
+      await tx.wait();
+      statusMsg("Funds released to the receiver.");
+      load();
+    } catch (err) { statusMsg(err.message || String(err), false); }
+  }
+
+  async function doAutoRelease() {
+    try {
+      await Tet.connectWallet();
+      const c = Tet.getEscrowContract();
+      const tx = await c.autoRelease(window._escrow.onchain_id);
+      await tx.wait();
+      statusMsg("Auto-release triggered — funds sent to the receiver.");
+      load();
+    } catch (err) {
+      const msg = (err.reason || err.message || String(err));
+      if (msg.includes("auto-release window not reached")) {
+        statusMsg("Not yet — the auto-release window hasn't passed since delivery.", false);
+      } else {
+        statusMsg(msg, false);
+      }
+    }
+  }
+
+  async function doDispute() {
+    const reason = prompt("Briefly describe the issue for the arbiter:");
+    if (!reason) return;
+    try {
+      await Tet.signInWithEthereum();
+      await TetApi.raiseDispute({ escrow_id: window._escrow.id, reason });
+      await Tet.connectWallet();
+      const c = Tet.getEscrowContract();
+      const tx = await c.raiseDispute(window._escrow.onchain_id, reason);
+      await tx.wait();
+      statusMsg("Dispute raised — an arbiter will review this agreement.");
+      load();
+    } catch (err) { statusMsg(err.message || String(err), false); }
+  }
+
+  load();
+</script>
+</body>
+</html>

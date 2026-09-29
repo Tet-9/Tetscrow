@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Disputes — Tet</title>
+<link rel="stylesheet" href="../css/styles.css" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a href="../index.html" class="brand" style="padding:10px 14px; margin-bottom:12px;"><span class="brand-mark"></span> Tet</a>
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="create-escrow.html">Create Agreement</a>
+    <a href="disputes.html" class="active">Disputes</a>
+    <a href="../index.html#token">$TET Token</a>
+    <div style="margin-top:auto; padding-top:20px;">
+      <button class="btn btn-primary" style="width:100%;" onclick="Tet.signInWithEthereum().then(loadAll)">Connect Wallet</button>
+      <div class="wallet-pill" data-wallet-pill style="margin-top:10px; justify-content:center;">Not connected</div>
+    </div>
+  </aside>
+
+  <main class="app-main">
+    <div class="page-head"><h1>Disputes &amp; Arbitration</h1></div>
+    <p style="color:var(--text-dim); max-width:640px; margin-bottom:28px;">
+      Any agreement in "funded" or "delivered" status can be disputed by either party.
+      The assigned arbiter reviews the on-chain agreement and the stated reason, then
+      resolves it by calling <code>resolveDispute()</code> — funds move to whichever
+      party the arbiter names as the winner.
+    </p>
+
+    <table class="table">
+      <thead><tr><th>Escrow</th><th>Raised by</th><th>Reason</th><th>Status</th></tr></thead>
+      <tbody id="dispute-rows">
+        <tr><td colspan="4" style="color:var(--text-dim);">Connect your wallet and open an agreement to view its disputes.</td></tr>
+      </tbody>
+    </table>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/wallet.js"></script>
+<script src="../js/api.js"></script>
+<script>
+  async function loadAll() {
+    const rowsEl = document.getElementById("dispute-rows");
+    try {
+      const escrows = await TetApi.myEscrows();
+      const disputed = escrows.filter((e) => e.status === "disputed" || e.status === "resolved");
+      if (!disputed.length) {
+        rowsEl.innerHTML = `<tr><td colspan="4" style="color:var(--text-dim);">No disputes on your agreements.</td></tr>`;
+        return;
+      }
+      const rows = await Promise.all(disputed.map(async (e) => {
+        const disputes = await TetApi.getDisputes(e.id);
+        return disputes.map((d) => `
+          <tr>
+            <td><a href="escrow-detail.html?id=${e.id}">${e.title}</a></td>
+            <td>${d.raised_by.slice(0,6)}...${d.raised_by.slice(-4)}</td>
+            <td>${d.reason}</td>
+            <td><span class="badge ${e.status}">${e.status}</span></td>
+          </tr>`).join("");
+      }));
+      rowsEl.innerHTML = rows.join("");
+    } catch (err) {
+      rowsEl.innerHTML = `<tr><td colspan="4" style="color:var(--danger);">Sign in with your wallet to view disputes.</td></tr>`;
+    }
+  }
+  if (localStorage.getItem("tet_jwt")) loadAll();
+</script>
+</body>
+</html>

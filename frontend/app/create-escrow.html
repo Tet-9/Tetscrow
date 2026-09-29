@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Create Job — Tet</title>
+<link rel="stylesheet" href="../css/landing.css" />
+<link rel="stylesheet" href="../css/app-home.css" />
+</head>
+<body>
+<div class="wrap">
+  <header class="app-top">
+    <a class="app-logo" href="../index.html" aria-label="Back to the Tet website"><span class="logo-mark" data-tet3d><svg viewBox="0 0 32 32" aria-hidden="true"><polygon points="16,2 2,25 19,30" fill="currentColor"/><polygon points="16,2 19,30 30,21" fill="currentColor" opacity=".55"/></svg></span><span>tet</span></a>
+    <nav style="display:flex;gap:32px;font-size:1.15rem;font-weight:600">
+      <a href="create-escrow.html" style="border-bottom:2px solid #000">Create Job</a>
+      <a href="dashboard.html" style="color:#777">Dashboard</a>
+    </nav>
+    <button class="btn-wallet" id="wallet-btn" data-wallet-pill>Connect Wallet</button>
+  </header>
+
+  <main id="gate"></main>
+
+  <main class="wiz" id="wizard" style="display:none">
+    <section class="wiz-steps">
+      <h3>Steps</h3>
+      <div class="wiz-bars"><span id="bar1"></span><span id="bar2"></span></div>
+      <div class="wiz-step" id="s1"><span class="arrow-i">&rarr;</span><div><strong>Basic info about the escrow.</strong></div></div>
+      <div class="wiz-step" id="s2"><span class="arrow-i">&rarr;</span><div><strong>Select asset and enter wallets.</strong></div></div>
+    </section>
+
+    <form class="wiz-card" id="step1" onsubmit="return false">
+      <div class="wiz-field"><input id="f-title" placeholder="Reason For Transaction" required /></div>
+      <div class="wiz-field"><textarea id="f-desc" placeholder="Enter Detailed Description"></textarea></div>
+      <div class="wiz-actions"><button class="btn-black-full" type="button" onclick="goStep(2)">Save and Go Forward</button></div>
+    </form>
+
+    <form class="wiz-card" id="step2" style="display:none" onsubmit="return false">
+      <button type="button" class="wiz-back" onclick="goStep(1)">&larr; Back</button>
+      <div class="wiz-field"><input id="f-receiver" placeholder="Receiver wallet address (0x...)" required /></div>
+      <div class="wiz-field"><input id="f-arbiter" placeholder="Arbiter wallet address (optional)" /></div>
+      <div class="wiz-field"><select id="f-asset"><option value="ETH">ETH</option><option value="USDC">USDC</option></select></div>
+      <div class="wiz-field"><input id="f-amount" type="number" step="0.000001" placeholder="Amount" required /></div>
+      <div class="wiz-field"><input id="f-terms" placeholder="Terms link (optional, ipfs:// or https://)" /></div>
+      <p id="status-msg" style="color:#666;font-size:.95rem"></p>
+      <div class="wiz-actions"><button class="btn-black-full" type="button" id="submit-btn" onclick="submitAgreement()">Create &amp; Fund Escrow</button></div>
+    </form>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="../js/hawk3d.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.2/ethers.umd.min.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/wallet.js"></script>
+<script src="../js/api.js"></script>
+<script>
+  function goStep(n) {
+    document.getElementById("step1").style.display = n === 1 ? "flex" : "none";
+    document.getElementById("step2").style.display = n === 2 ? "flex" : "none";
+    document.getElementById("s1").classList.toggle("active", n === 1);
+    document.getElementById("s2").classList.toggle("active", n === 2);
+    document.getElementById("bar1").classList.add("done");
+    document.getElementById("bar2").classList.toggle("done", n === 2);
+    if (n === 1) { document.getElementById("bar2").classList.remove("done"); }
+  }
+
+  async function submitAgreement() {
+    const statusEl = document.getElementById("status-msg");
+    const btn = document.getElementById("submit-btn");
+    const title = document.getElementById("f-title").value.trim();
+    const description = document.getElementById("f-desc").value.trim();
+    const receiver = document.getElementById("f-receiver").value.trim();
+    const arbiter = document.getElementById("f-arbiter").value.trim();
+    const asset = document.getElementById("f-asset").value;
+    const amount = document.getElementById("f-amount").value.trim();
+    const termsURI = document.getElementById("f-terms").value.trim();
+
+    if (!title || !receiver || !amount) {
+      statusEl.textContent = "Title, receiver address, and amount are required.";
+      statusEl.style.color = "var(--danger)";
+      return;
+    }
+    if (!/^0x[0-9a-fA-F]{40}$/.test(receiver)) {
+      statusEl.textContent = "Receiver must be a valid wallet address (0x...).";
+      statusEl.style.color = "var(--danger)";
+      return;
+    }
+
+    btn.disabled = true;
+    try {
+      statusEl.style.color = "var(--text-dim)";
+      statusEl.textContent = "Saving details...";
+      const isNative = Tet.assetFor(asset).kind === "native";
+      const escrow = await TetApi.createEscrow({
+        title, description, terms_uri: termsURI || null,
+        receiver_address: receiver, arbiter_address: arbiter || null,
+        token_address: isNative ? null : Tet.tokenAddressFor(asset), amount,
+      });
+
+      statusEl.textContent = isNative ? "Confirm the transaction in your wallet -- this locks the funds on-chain..."
+        : "Confirm the approval, then the deposit, in your wallet -- this locks the USDC on-chain...";
+      const { onchainId, txHash } = await Tet.createAndFundAgreement({ receiver, arbiter, asset, amount, termsURI });
+
+      await TetApi.confirmEscrow(escrow.id, { onchain_id: onchainId, tx_hash: txHash });
+      statusEl.style.color = "var(--accent)";
+      statusEl.textContent = "Escrow funded and confirmed on-chain. Redirecting...";
+      setTimeout(() => location.href = `escrow-detail.html?id=${escrow.id}`, 1200);
+    } catch (err) {
+      console.error(err);
+      statusEl.style.color = "var(--danger)";
+      statusEl.textContent = "Something went wrong: " + (err.reason || err.message || err);
+      btn.disabled = false;
+    }
+  }
+
+  const gate = document.getElementById("gate"), wizard = document.getElementById("wizard"), btn = document.getElementById("wallet-btn");
+  function short(a) { return a.slice(0, 6) + "..." + a.slice(-4); }
+  function showGate() {
+    gate.style.display = "block"; wizard.style.display = "none";
+    gate.innerHTML = '<div class="gate"><div class="hawk-slot" data-scene="computer" data-img="../assets/hawk-computer.png" aria-label="Hawk at a computer terminal"></div>' +
+      '<p>Authorization required, please connect wallet to begin.</p>' +
+      '<button class="btn-white" style="background:#000;color:#fff" onclick="connect()">Connect Wallet</button></div>';
+    if (window.Hawk3D) window.Hawk3D.scan(gate);
+  }
+  async function connect() {
+    try {
+      const ok = await Tet.signInWithEthereum();
+      if (ok) { gate.style.display = "none"; wizard.style.display = "grid"; goStep(1); btn.textContent = short(localStorage.getItem("tet_wallet") || "Connected"); }
+    } catch (e) { alert("Couldn't sign in. Is the Tet server running?"); }
+  }
+  btn.addEventListener("click", connect);
+  if (localStorage.getItem("tet_jwt")) {
+    wizard.style.display = "grid"; goStep(1); btn.textContent = short(localStorage.getItem("tet_wallet") || "Connected");
+  } else {
+    showGate();
+  }
+</script>
+</body>
+</html>
